@@ -1,0 +1,52 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+
+      "ami_name":      "packer-push-perms-{{ isotime \"2006.01.02-1504\" }}",
+      "instance_type": "t2.micro",
+      "region":        "us-east-1",
+      "source_ami_filter": {
+        "filters": {
+          "name":                "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
+          "root-device-type":    "ebs",
+          "virtualization-type": "hvm"
+        },
+        "most_recent": true,
+        "owners":      ["099720109477"]
+      },
+      "ssh_username": "ubuntu"
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell-local",
+
+      "command": "ls -al some-binary"
+    },
+    {
+      "type": "shell",
+
+      "inline": ["mkdir -p /tmp/packer-push-perms"]
+    },
+    {
+      "type": "file",
+
+      "source": ".",
+      "destination": "/tmp/packer-push-perms"
+    },
+    {
+      "type": "shell",
+
+      "inline": [
+        "ls -al /tmp/packer-push-perms/some-binary",
+        "exit 1"
+      ]
+    }
+  ],
+
+  "push": {
+    "vcs": true
+  }
+}
